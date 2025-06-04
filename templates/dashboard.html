@@ -1,0 +1,297 @@
+{% extends "base.html" %}
+
+{% block title %}דשבורד - Data Talk{% endblock %}
+
+{% block content %}
+<!-- Main Header -->
+<div class="main-header">
+    <h1 class="welcome-title">שלום {{ user.name }}!</h1>
+    <p class="welcome-subtitle"> איך אפשר לעזור לך לקבל החלטה חכמה היום?</p>
+</div>
+
+<!-- Search Section -->
+<div class="search-section">
+    <div class="search-container">
+        <input type="text" 
+               class="search-input" 
+               id="searchInput"
+               placeholder="בחר ניתוח או הקלד מה אתה רוצה לבדוק..."
+               autocomplete="off">
+        <button class="search-submit" onclick="performSearch()">
+            <i class="fas fa-paper-plane"></i>
+        </button>
+    </div>
+
+    <!-- Quick Actions Pills -->
+    <div class="quick-actions" id="quickActions">
+        <!-- Active Actions -->
+        <a href="/action/traffic-quality" class="action-pill" data-description="ניתוח מעמיק של מקורות התנועה שמביאים את המבקרים הכי איכותיים לאתר שלך">
+            <i class="fas fa-trophy"></i>
+            מקורות תנועה איכותיים
+        </a>
+        
+        <a href="/action/search-keywords" class="action-pill" data-description="גלה איזו מילת חיפוש מביאה לך הכי הרבה תנועה מגוגל ואיך לשפר את הדירוג">
+            <i class="fas fa-search"></i>
+            מילות חיפוש מובילות
+        </a>
+
+        <!-- Coming Soon Actions -->
+        <div class="action-pill" data-description="ניתוח תשואה על השקעה - איזה ערוץ פרסום מחזיר לך הכי הרבה כסף" onclick="showComingSoon('ROI Analysis')">
+            <i class="fas fa-dollar-sign"></i>
+            ניתוח ROI
+        </div>
+
+        <div class="action-pill" data-description="ניתוח משפך המרות - איפה אתה מאבד כסף במשפך המכירות" onclick="showComingSoon('Conversion Funnel')">
+            <i class="fas fa-funnel-dollar"></i>
+            משפך המרות
+        </div>
+
+        <div class="action-pill" data-description="אופטימיזציה תקציבית - איך לחלק את התקציב הפרסומי כדי למקסם רווחים" onclick="showComingSoon('Budget Optimization')">
+            <i class="fas fa-chart-pie"></i>
+            אופטימיזציה תקציבית
+        </div>
+
+        <div class="action-pill" data-description="ניתוח ביצועי קמפיינים - איך הקמפיינים שלך מבצעים בפייסבוק וגוגל" onclick="showComingSoon('Campaign Analysis')">
+            <i class="fas fa-bullhorn"></i>
+            ביצועי קמפיינים
+        </div>
+
+        <div class="action-pill" data-description="ניתוח טרנדים בתחום שלך - מה החם עכשיו בענף" onclick="showComingSoon('Industry Trends')">
+            <i class="fas fa-trending-up"></i>
+            טרנדים בתחום
+        </div>
+
+        <div class="action-pill" data-description="ניתוח תוכן - איזה תוכן מעניין הכי הרבה מבקרים ומביא המרות" onclick="showComingSoon('Content Performance')">
+            <i class="fas fa-newspaper"></i>
+            ביצועי תוכן
+        </div>
+    </div>
+</div>
+
+<!-- Recent Analysis Results (if any) -->
+{% if recent_analysis %}
+<div class="analysis-section">
+    <div class="results-container">
+        <div class="results-header">
+            <i class="fas fa-clock"></i>
+            <h3>הניתוח האחרון שלך</h3>
+        </div>
+        <!-- Previous results would go here -->
+    </div>
+</div>
+{% endif %}
+
+<!-- Getting Started Section (for new users) -->
+{% if not analytics_accounts and not search_console_accounts %}
+<div class="analysis-section">
+    <div class="results-container" style="text-align: center; padding: 3rem 2rem;">
+        <i class="fas fa-rocket" style="font-size: 3rem; color: var(--primary-color); margin-bottom: 1rem;"></i>
+        <h3 style="margin-bottom: 1rem; color: var(--text-primary);">בוא נתחיל!</h3>
+        <p style="color: var(--text-secondary); margin-bottom: 2rem; max-width: 500px; margin-left: auto; margin-right: auto;">
+            כדי להתחיל לקבל תובנות על הנתונים שלך, חבר את חשבונות Google Analytics ו-Search Console
+        </p>
+        <a href="{{ url_for('accounts') }}" class="btn btn-primary">
+            <i class="fas fa-link"></i>
+            חבר חשבונות
+        </a>
+    </div>
+</div>
+{% endif %}
+
+<!-- Quick Stats Overview (if accounts connected) -->
+{% if analytics_accounts or search_console_accounts %}
+<div class="analysis-section">
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+        
+        {% if analytics_accounts %}
+        <div class="insight-card" style="text-align: center;">
+            <h6 style="justify-content: center;">
+                <i class="fas fa-chart-bar" style="color: var(--primary-color);"></i>
+                Google Analytics
+            </h6>
+            <p style="font-size: 2rem; font-weight: 700; color: var(--primary-color); margin: 0.5rem 0;">{{ analytics_accounts|length }}</p>
+            <p style="margin: 0;">{{ 'חשבון מחובר' if analytics_accounts|length == 1 else 'חשבונות מחוברים' }}</p>
+        </div>
+        {% endif %}
+
+        {% if search_console_accounts %}
+        <div class="insight-card" style="text-align: center;">
+            <h6 style="justify-content: center;">
+                <i class="fas fa-search" style="color: var(--primary-color);"></i>
+                Search Console
+            </h6>
+            <p style="font-size: 2rem; font-weight: 700; color: var(--primary-color); margin: 0.5rem 0;">{{ search_console_accounts|length }}</p>
+            <p style="margin: 0;">{{ 'אתר מחובר' if search_console_accounts|length == 1 else 'אתרים מחוברים' }}</p>
+        </div>
+        {% endif %}
+
+        <div class="insight-card" style="text-align: center;">
+            <h6 style="justify-content: center;">
+                <i class="fas fa-chart-line" style="color: var(--primary-color);"></i>
+                ניתוחים זמינים
+            </h6>
+            <p style="font-size: 2rem; font-weight: 700; color: var(--primary-color); margin: 0.5rem 0;">2</p>
+            <p style="margin: 0;">ניתוחים מוכנים לשימוש</p>
+        </div>
+
+        <div class="insight-card" style="text-align: center;">
+            <h6 style="justify-content: center;">
+                <i class="fas fa-clock" style="color: var(--primary-color);"></i>
+                עדכון אחרון
+            </h6>
+            <p style="font-size: 1.25rem; font-weight: 600; color: var(--primary-color); margin: 0.5rem 0;">עכשיו</p>
+            <p style="margin: 0;">נתונים מעודכנים</p>
+        </div>
+    </div>
+
+    <!-- Quick Actions Suggestion -->
+    <div class="results-container">
+        <div class="results-header">
+            <i class="fas fa-lightbulb"></i>
+            <h3>מה כדאי לבדוק היום?</h3>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;">
+            <div style="padding: 1rem; border: 1px solid var(--border-color); border-radius: 8px;">
+                <h6 style="color: var(--text-primary); margin-bottom: 0.5rem;">🏆 בדוק את מקורות התנועה האיכותיים</h6>
+                <p style="color: var(--text-secondary); font-size: 0.875rem; margin-bottom: 1rem;">גלה איזה ערוץ מביא לך את המבקרים הכי מעורבים ובעלי ערך</p>
+                <a href="/action/traffic-quality" class="btn btn-primary" style="font-size: 0.8rem; padding: 0.5rem 1rem;">התחל ניתוח</a>
+            </div>
+            
+            <div style="padding: 1rem; border: 1px solid var(--border-color); border-radius: 8px;">
+                <h6 style="color: var(--text-primary); margin-bottom: 0.5rem;">🔍 מילות החיפוש הכי חזקות שלך</h6>
+                <p style="color: var(--text-secondary); font-size: 0.875rem; margin-bottom: 1rem;">בדוק איזה מילות מפתח מביאות הכי הרבה תנועה ואיך לשפר</p>
+                <a href="/action/search-keywords" class="btn btn-primary" style="font-size: 0.8rem; padding: 0.5rem 1rem;">התחל ניתוח</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<script>
+// Search functionality with autocomplete
+const searchInput = document.getElementById('searchInput');
+const quickActions = document.querySelectorAll('.action-pill');
+
+// Create suggestions array
+const suggestions = [];
+quickActions.forEach(pill => {
+    const text = pill.textContent.trim();
+    const description = pill.getAttribute('data-description');
+    if (text && description) {
+        suggestions.push({
+            title: text,
+            description: description,
+            href: pill.href || '#',
+            element: pill
+        });
+    }
+});
+
+// Search input event listeners
+searchInput.addEventListener('input', function() {
+    const query = this.value.toLowerCase();
+    
+    // Highlight matching pills
+    quickActions.forEach(pill => {
+        const text = pill.textContent.toLowerCase();
+        if (query && text.includes(query)) {
+            pill.classList.add('active');
+        } else {
+            pill.classList.remove('active');
+        }
+    });
+});
+
+// Action pill click handlers
+quickActions.forEach(pill => {
+    pill.addEventListener('click', function(e) {
+        const description = this.getAttribute('data-description');
+        if (description) {
+            searchInput.value = description;
+            
+            // Remove active from all pills
+            quickActions.forEach(p => p.classList.remove('active'));
+            // Add active to clicked pill
+            this.classList.add('active');
+        }
+    });
+});
+
+// Perform search function
+function performSearch() {
+    const query = searchInput.value.trim();
+    if (!query) return;
+    
+    // Find matching action
+    const matchingAction = Array.from(quickActions).find(pill => {
+        const description = pill.getAttribute('data-description');
+        return description && (description.includes(query) || query.includes(description.substring(0, 20)));
+    });
+    
+    if (matchingAction && matchingAction.href && matchingAction.href !== '#') {
+        window.location.href = matchingAction.href;
+    } else {
+        // Show coming soon message
+        showComingSoon('חיפוש מתקדם');
+    }
+}
+
+// Enter key handler
+searchInput.addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        performSearch();
+    }
+});
+
+// Coming soon function
+function showComingSoon(feature) {
+    // Create and show a nice modal or toast
+    const toast = document.createElement('div');
+    toast.style.cssText = `
+        position: fixed;
+        top: 2rem;
+        right: 50%;
+        transform: translateX(50%);
+        background: var(--primary-color);
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 8px;
+        box-shadow: var(--shadow-md);
+        z-index: 9999;
+        font-weight: 500;
+        animation: slideDown 0.3s ease;
+    `;
+    toast.innerHTML = `
+        <i class="fas fa-info-circle" style="margin-left: 0.5rem;"></i>
+        ${feature} יהיה זמין בקרוב!
+    `;
+    
+    // Add animation
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes slideDown {
+            from { transform: translateX(50%) translateY(-100%); opacity: 0; }
+            to { transform: translateX(50%) translateY(0); opacity: 1; }
+        }
+    `;
+    document.head.appendChild(style);
+    
+    document.body.appendChild(toast);
+    
+    // Remove after 3 seconds
+    setTimeout(() => {
+        toast.style.animation = 'slideDown 0.3s ease reverse';
+        setTimeout(() => {
+            if (toast.parentNode) {
+                toast.parentNode.removeChild(toast);
+            }
+        }, 300);
+    }, 3000);
+}
+
+// Auto-focus search on page load
+document.addEventListener('DOMContentLoaded', function() {
+    searchInput.focus();
+});
+</script>
+{% endblock %}

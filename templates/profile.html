@@ -1,0 +1,252 @@
+{% extends "base.html" %}
+
+{% block title %}פרופיל - Data Talk{% endblock %}
+
+{% block content %}
+<!-- Main Header -->
+<div class="main-header">
+    <h1 class="welcome-title">הפרופיל שלי</h1>
+    <p class="welcome-subtitle">ניהול פרטים אישיים והגדרות חשבון</p>
+</div>
+
+<!-- Profile Section -->
+<div class="analysis-section">
+    
+    <!-- Profile Overview -->
+    <div class="results-container" style="margin-bottom: 2rem;">
+        <div style="display: flex; align-items: center; gap: 2rem; margin-bottom: 2rem;">
+            <!-- Avatar -->
+            <div style="width: 5rem; height: 5rem; border-radius: 50%; background: var(--primary-color); display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: 700; color: white;">
+                {{ user.name[0].upper() }}
+            </div>
+            
+            <!-- User Info -->
+            <div style="flex: 1;">
+                <h2 style="margin: 0 0 0.5rem 0; color: var(--text-primary); font-weight: 600;">{{ user.name }}</h2>
+                <p style="margin: 0 0 0.75rem 0; color: var(--text-secondary); font-size: 1.125rem;">{{ user.email }}</p>
+                <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                    <span style="background: #dcfce7; color: #16a34a; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.8rem; font-weight: 500;">
+                        <i class="fas fa-check" style="margin-left: 0.25rem;"></i>
+                        משתמש מאומת
+                    </span>
+                    <span style="background: #dbeafe; color: #2563eb; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.8rem; font-weight: 500;">
+                        <i class="fas fa-calendar" style="margin-left: 0.25rem;"></i>
+                        חבר מאז {{ user.created_at|hebrew_date }}
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Account Details & Statistics -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+        
+        <!-- Account Information -->
+        <div class="insight-card">
+            <h6 style="color: var(--text-primary); margin-bottom: 1.5rem; font-weight: 600; display: flex; align-items: center; gap: 0.5rem;">
+                <i class="fas fa-info-circle" style="color: var(--primary-color);"></i>
+                פרטי חשבון
+            </h6>
+            
+            <div style="space-y: 1rem;">
+                <div style="margin-bottom: 1rem;">
+                    <div style="font-weight: 500; color: var(--text-primary); margin-bottom: 0.25rem; font-size: 0.875rem;">שם מלא:</div>
+                    <div style="color: var(--text-secondary);">{{ user.name }}</div>
+                </div>
+                
+                <div style="margin-bottom: 1rem;">
+                    <div style="font-weight: 500; color: var(--text-primary); margin-bottom: 0.25rem; font-size: 0.875rem;">כתובת אימייל:</div>
+                    <div style="color: var(--text-secondary);">{{ user.email }}</div>
+                </div>
+                
+                <div style="margin-bottom: 1rem;">
+                    <div style="font-weight: 500; color: var(--text-primary); margin-bottom: 0.25rem; font-size: 0.875rem;">תאריך הצטרפות:</div>
+                    <div style="color: var(--text-secondary);">{{ user.created_at|hebrew_date }}</div>
+                </div>
+                
+                <div style="margin-bottom: 1rem;">
+                    <div style="font-weight: 500; color: var(--text-primary); margin-bottom: 0.25rem; font-size: 0.875rem;">מזהה Google:</div>
+                    <div style="color: var(--text-muted); font-size: 0.8rem;">
+                        {% if user.google_id %}
+                            {{ user.google_id[:15] }}***
+                        {% else %}
+                            לא מחובר
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Account Statistics -->
+        <div class="insight-card">
+            <h6 style="color: var(--text-primary); margin-bottom: 1.5rem; font-weight: 600; display: flex; align-items: center; gap: 0.5rem;">
+                <i class="fas fa-chart-line" style="color: var(--primary-color);"></i>
+                סטטיסטיקות
+            </h6>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div style="text-align: center; padding: 1rem; background: var(--background); border: 1px solid var(--border-color); border-radius: 8px;">
+                    <div style="font-size: 1.5rem; font-weight: 700; color: var(--primary-color); margin-bottom: 0.25rem;">
+                        {% if user.is_active %}פעיל{% else %}לא פעיל{% endif %}
+                    </div>
+                    <div style="font-size: 0.8rem; color: var(--text-secondary);">סטטוס חשבון</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Connected Services -->
+    <div class="results-container" style="margin-bottom: 2rem;">
+        <div class="results-header">
+            <i class="fas fa-link"></i>
+            <h3>שירותים מחוברים</h3>
+        </div>
+        
+        <div style="display: grid; gap: 1rem;">
+            <!-- Google Services -->
+            <div style="display: flex; align-items: center; justify-content: space-between; padding: 1.5rem; background: var(--background-secondary); border: 1px solid var(--border-color); border-radius: 12px;">
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <div style="width: 3rem; height: 3rem; border-radius: 50%; background: #db4437; display: flex; align-items: center; justify-content: center;">
+                        <i class="fab fa-google" style="color: white; font-size: 1.25rem;"></i>
+                    </div>
+                    <div>
+                        <h6 style="margin: 0 0 0.25rem 0; color: var(--text-primary); font-weight: 600;">Google Services</h6>
+                        <p style="margin: 0; color: var(--text-secondary); font-size: 0.875rem;">Analytics & Search Console</p>
+                    </div>
+                </div>
+                {% if user.google_id %}
+                    <span style="background: #dcfce7; color: #16a34a; padding: 0.5rem 1rem; border-radius: 20px; font-weight: 500;">
+                        <i class="fas fa-check" style="margin-left: 0.25rem;"></i>מחובר
+                    </span>
+                {% else %}
+                    <span style="background: #f3f4f6; color: var(--text-muted); padding: 0.5rem 1rem; border-radius: 20px; font-weight: 500;">
+                        <i class="fas fa-times" style="margin-left: 0.25rem;"></i>לא מחובר
+                    </span>
+                {% endif %}
+            </div>
+
+            <!-- Facebook Services -->
+            <div style="display: flex; align-items: center; justify-content: space-between; padding: 1.5rem; background: var(--background-secondary); border: 1px solid var(--border-color); border-radius: 12px;">
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <div style="width: 3rem; height: 3rem; border-radius: 50%; background: #1877f2; display: flex; align-items: center; justify-content: center;">
+                        <i class="fab fa-facebook" style="color: white; font-size: 1.25rem;"></i>
+                    </div>
+                    <div>
+                        <h6 style="margin: 0 0 0.25rem 0; color: var(--text-primary); font-weight: 600;">Facebook Ads</h6>
+                        <p style="margin: 0; color: var(--text-secondary); font-size: 0.875rem;">מודעות ופרסום</p>
+                    </div>
+                </div>
+                {% if user.facebook_id %}
+                    <span style="background: #dcfce7; color: #16a34a; padding: 0.5rem 1rem; border-radius: 20px; font-weight: 500;">
+                        <i class="fas fa-check" style="margin-left: 0.25rem;"></i>מחובר
+                    </span>
+                {% else %}
+                    <span style="background: #f3f4f6; color: var(--text-muted); padding: 0.5rem 1rem; border-radius: 20px; font-weight: 500;">
+                        <i class="fas fa-times" style="margin-left: 0.25rem;"></i>לא מחובר
+                    </span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Account Actions -->
+    <div class="results-container">
+        <div class="results-header">
+            <i class="fas fa-cogs"></i>
+            <h3>פעולות חשבון</h3>
+        </div>
+        
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+            <a href="{{ url_for('dashboard') }}" class="btn btn-primary" style="text-decoration: none; justify-content: center;">
+                <i class="fas fa-tachometer-alt"></i>
+                חזור לדשבורד
+            </a>
+            
+            <a href="{{ url_for('accounts') }}" class="btn btn-outline" style="text-decoration: none; justify-content: center;">
+                <i class="fas fa-link"></i>
+                ניהול חשבונות
+            </a>
+            
+            <a href="{{ url_for('auth.google_login') }}" class="btn btn-secondary" style="text-decoration: none; justify-content: center;">
+                <i class="fab fa-google"></i>
+                חבר מחדש Google
+            </a>
+            
+            <button onclick="confirmLogout()" class="btn btn-secondary" style="justify-content: center;">
+                <i class="fas fa-sign-out-alt"></i>
+                התנתק
+            </button>
+        </div>
+
+        <!-- Danger Zone -->
+        <div style="border: 1px solid #fecaca; border-radius: 12px; padding: 1.5rem; background: #fef2f2;">
+            <h6 style="color: #dc2626; margin-bottom: 1rem; font-weight: 600; display: flex; align-items: center; gap: 0.5rem;">
+                <i class="fas fa-exclamation-triangle"></i>
+                אזור מסוכן
+            </h6>
+            <p style="color: #7f1d1d; margin-bottom: 1rem; font-size: 0.875rem; line-height: 1.5;">
+                פעולות אלו יסירו את כל הנתונים שלך ולא ניתן לבטל אותן. אנא שקול היטב לפני ביצוע פעולות אלה.
+            </p>
+            <button onclick="confirmDeleteAccount()" class="btn" style="background: #dc2626; color: white; border: 1px solid #dc2626;">
+                <i class="fas fa-trash"></i>
+                מחק חשבון
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+function confirmLogout() {
+    if (confirm('האם אתה בטוח שברצונך להתנתק?')) {
+        window.location.href = "{{ url_for('auth.logout') }}";
+    }
+}
+
+function confirmDeleteAccount() {
+    if (confirm('האם אתה בטוח שברצונך למחוק את החשבון? פעולה זו לא ניתנת לביטול!')) {
+        if (confirm('בטוח? כל הנתונים והחיבורים שלך יימחקו לצמיתות!')) {
+            // כאן נוסיף בעתיד את הפונקציונליות למחיקת חשבון
+            alert('פונקציונליות מחיקת חשבון תתווסף בגרסה הבאה. נכון לעכשיו, אתה יכול לפנות לתמיכה.');
+        }
+    }
+}
+
+// Auto-focus and smooth interactions
+document.addEventListener('DOMContentLoaded', function() {
+    // Add hover effects to cards
+    const cards = document.querySelectorAll('.insight-card, .results-container');
+    cards.forEach(card => {
+        card.style.transition = 'transform 0.2s ease, box-shadow 0.2s ease';
+        
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-2px)';
+            this.style.boxShadow = 'var(--shadow-md)';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+            this.style.boxShadow = 'var(--shadow-sm)';
+        });
+    });
+});
+</script>
+{% endblock %}5rem; font-weight: 700; color: var(--primary-color); margin-bottom: 0.25rem;">{{ user.accounts|length }}</div>
+                    <div style="font-size: 0.8rem; color: var(--text-secondary);">חשבונות מחוברים</div>
+                </div>
+                
+                <div style="text-align: center; padding: 1rem; background: var(--background); border: 1px solid var(--border-color); border-radius: 8px;">
+                    <div style="font-size: 1.5rem; font-weight: 700; color: var(--primary-color); margin-bottom: 0.25rem;">
+                        {% if user.google_tokens %}1{% else %}0{% endif %}
+                    </div>
+                    <div style="font-size: 0.8rem; color: var(--text-secondary);">Google Tokens</div>
+                </div>
+                
+                <div style="text-align: center; padding: 1rem; background: var(--background); border: 1px solid var(--border-color); border-radius: 8px;">
+                    <div style="font-size: 1.5rem; font-weight: 700; color: var(--primary-color); margin-bottom: 0.25rem;">
+                        {% if user.facebook_tokens %}1{% else %}0{% endif %}
+                    </div>
+                    <div style="font-size: 0.8rem; color: var(--text-secondary);">Facebook Tokens</div>
+                </div>
+                
+                <div style="text-align: center; padding: 1rem; background: var(--background); border: 1px solid var(--border-color); border-radius: 8px;">
+                    <div style="font-size: 1.

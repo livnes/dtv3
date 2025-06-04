@@ -1,0 +1,424 @@
+{% extends "base.html" %}
+
+{% block title %}{{ action.title }} - Data Talk{% endblock %}
+
+{% block content %}
+<div style="padding: 2rem; max-width: 1200px; margin: 0 auto;">
+    <!-- Header -->
+    <div style="margin-bottom: 2rem;">
+        <!-- Breadcrumb -->
+        <nav style="margin-bottom: 1.5rem;">
+            <div style="background: var(--background-secondary); padding: 1rem 1.5rem; border-radius: 8px; border: 1px solid var(--border-color);">
+                <a href="{{ url_for('dashboard') }}" style="color: var(--primary-color); text-decoration: none; font-weight: 500;">דשבורד</a>
+                <span style="color: var(--text-muted); margin: 0 0.5rem;">></span>
+                <span style="color: var(--text-primary); font-weight: 600;">{{ action.title }}</span>
+            </div>
+        </nav>
+        
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem;">
+            <div>
+                <h1 style="font-size: 2rem; font-weight: 700; color: var(--text-primary); margin: 0 0 0.5rem 0; display: flex; align-items: center; gap: 0.75rem;">
+                    <i class="fas fa-trophy" style="color: var(--primary-color);"></i>
+                    {{ action.title }}
+                </h1>
+                <p style="color: var(--text-secondary); margin: 0; font-size: 1.125rem;">{{ action.description }}</p>
+            </div>
+            <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">
+                <i class="fas fa-arrow-right"></i>
+                חזור לדשבורד
+            </a>
+        </div>
+    </div>
+
+    <!-- Explanation Card -->
+    <div class="results-container" style="margin-top: 0;">
+        <div class="results-header">
+            <i class="fas fa-info-circle"></i>
+            <h3>מה זה אומר?</h3>
+        </div>
+        <div style="margin-bottom: 1.5rem;">
+            <p style="color: var(--text-secondary); margin-bottom: 1.5rem; line-height: 1.6;">{{ action.explanation }}</p>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem;">
+                <div>
+                    <h6 style="color: var(--primary-color); margin-bottom: 1rem; font-weight: 600;">המדדים שנבחן:</h6>
+                    <ul style="list-style: none; padding: 0; margin: 0;">
+                        {% for metric in action.metrics %}
+                        <li style="margin-bottom: 0.5rem; color: var(--text-secondary); display: flex; align-items: center; gap: 0.5rem;">
+                            <i class="fas fa-check" style="color: var(--primary-color); width: 1rem;"></i>
+                            {{ metric }}
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                <div>
+                    <h6 style="color: var(--primary-color); margin-bottom: 1rem; font-weight: 600;">נוסחת איכות התנועה:</h6>
+                    <div style="background: var(--background-secondary); border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem;">
+                        <small style="color: var(--text-secondary);">
+                            <strong>ציון איכות =</strong><br>
+                            (זמן שהייה × 0.3) +<br>
+                            ((100 - שיעור נטישה) × 0.3) +<br>
+                            (דפים לביקור × 0.2) +<br>
+                            (המרות × 0.2)
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Analysis Configuration -->
+    <div class="results-container">
+        <div class="results-header">
+            <i class="fas fa-cogs"></i>
+            <h3>הגדרות ניתוח</h3>
+        </div>
+        <form id="analysisForm">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+                <!-- Date Range Selection -->
+                <div class="form-group">
+                    <label class="form-label">טווח תאריכים:</label>
+                    <select class="form-control form-select" id="dateRange" name="dateRange">
+                        <option value="7days">7 ימים אחרונים</option>
+                        <option value="30days" selected>30 ימים אחרונים</option>
+                        <option value="90days">90 ימים אחרונים</option>
+                        <option value="custom">תאריכים מותאמים</option>
+                    </select>
+                </div>
+
+                <!-- Custom Date Range -->
+                <div class="form-group" id="customDateRange" style="display: none;">
+                    <label class="form-label">תאריכים מותאמים:</label>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
+                        <div>
+                            <input type="date" class="form-control" id="startDate" name="startDate">
+                            <small style="color: var(--text-muted);">מתאריך</small>
+                        </div>
+                        <div>
+                            <input type="date" class="form-control" id="endDate" name="endDate">
+                            <small style="color: var(--text-muted);">עד תאריך</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Comparison Selection -->
+                <div class="form-group">
+                    <label class="form-label">השוואה:</label>
+                    <select class="form-control form-select" id="comparison" name="comparison">
+                        <option value="none">ללא השוואה</option>
+                        <option value="previous" selected>לתקופה הקודמת</option>
+                        <option value="year">לשנה שעברה</option>
+                    </select>
+                </div>
+
+                <!-- Account Selection -->
+                {% if action.service_type == 'analytics' %}
+                <div class="form-group">
+                    <label class="form-label">חשבון Analytics:</label>
+                    <select class="form-control form-select" id="analyticsAccount" name="analyticsAccount">
+                        {% for account in active_accounts %}
+                            {% if account.account_type == 'google_analytics' %}
+                            <option value="{{ account.account_id }}">{{ account.account_name }}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                </div>
+                {% elif action.service_type == 'search_console' %}
+                <div class="form-group">
+                    <label class="form-label">אתר Search Console:</label>
+                    <select class="form-control form-select" id="searchAccount" name="searchAccount">
+                        {% for account in active_accounts %}
+                            {% if account.account_type == 'search_console' %}
+                            <option value="{{ account.account_id }}">{{ account.website_url }}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Run Analysis Button -->
+            <div style="text-align: center;">
+                <button type="submit" class="btn btn-primary" style="padding: 1rem 2rem; font-size: 1rem;" id="runAnalysisBtn">
+                    <i class="fas fa-play"></i>
+                    הפעל ניתוח
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Results Section -->
+    <div id="resultsSection" style="display: none;">
+        <!-- Loading State -->
+        <div class="results-container" id="loadingCard">
+            <div style="text-align: center; padding: 3rem 2rem;">
+                <div class="loading-spinner" style="width: 3rem; height: 3rem; margin-bottom: 1rem;"></div>
+                <h4 style="color: var(--text-secondary); margin-bottom: 0.5rem;">מנתח את הנתונים שלך...</h4>
+                <p style="color: var(--text-muted); margin: 0;">זה עלול לקחת כמה שניות</p>
+            </div>
+        </div>
+
+        <!-- Results Display -->
+        <div class="results-container" id="resultsCard" style="display: none;">
+            <div class="results-header">
+                <i class="fas fa-chart-bar"></i>
+                <h3>תוצאות הניתוח</h3>
+            </div>
+            
+            <!-- Top Traffic Sources Table -->
+            <div style="margin-bottom: 2rem;">
+                <h6 style="color: var(--primary-color); margin-bottom: 1rem; font-weight: 600;">מקורות התנועה המובילים (לפי ציון איכות):</h6>
+                <div style="overflow-x: auto;">
+                    <table class="results-table" id="resultsTable">
+                        <thead>
+                            <tr>
+                                <th>מקור תנועה</th>
+                                <th>ביקורים</th>
+                                <th>זמן ממוצע</th>
+                                <th>שיעור נטישה</th>
+                                <th>דפים לביקור</th>
+                                <th>ציון איכות</th>
+                            </tr>
+                        </thead>
+                        <tbody id="resultsTableBody">
+                            <!-- Results will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- AI Insights -->
+            <div class="insight-card" id="aiInsights">
+                <h6>
+                    <i class="fas fa-robot" style="color: var(--primary-color);"></i>
+                    תובנות AI
+                </h6>
+                <div id="aiInsightsContent">
+                    <!-- AI analysis will be populated here -->
+                </div>
+            </div>
+
+            <!-- Recommendations -->
+            <div class="insight-card" id="recommendations">
+                <h6>
+                    <i class="fas fa-lightbulb" style="color: var(--primary-color);"></i>
+                    המלצות לפעולה
+                </h6>
+                <div id="recommendationsContent">
+                    <!-- Recommendations will be populated here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Error Display -->
+        <div class="results-container" id="errorCard" style="display: none; border: 2px solid #dc3545;">
+            <div style="text-align: center; padding: 2rem;">
+                <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: #dc3545; margin-bottom: 1rem;"></i>
+                <h4 style="color: #dc3545; margin-bottom: 1rem;">שגיאה בניתוח</h4>
+                <p style="color: var(--text-secondary); margin-bottom: 1.5rem;" id="errorMessage"></p>
+                <button class="btn btn-outline" onclick="hideResults()" style="border-color: #dc3545; color: #dc3545;">
+                    <i class="fas fa-redo"></i>
+                    נסה שוב
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+// Date range handling
+document.getElementById('dateRange').addEventListener('change', function() {
+    const customRange = document.getElementById('customDateRange');
+    if (this.value === 'custom') {
+        customRange.style.display = 'block';
+        // Set default dates
+        const endDate = new Date();
+        const startDate = new Date();
+        startDate.setDate(endDate.getDate() - 30);
+        
+        document.getElementById('endDate').value = endDate.toISOString().split('T')[0];
+        document.getElementById('startDate').value = startDate.toISOString().split('T')[0];
+    } else {
+        customRange.style.display = 'none';
+    }
+});
+
+// Form submission
+document.getElementById('analysisForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    runAnalysis();
+});
+
+function runAnalysis() {
+    // Show results section and loading
+    const resultsSection = document.getElementById('resultsSection');
+    const loadingCard = document.getElementById('loadingCard');
+    const resultsCard = document.getElementById('resultsCard');
+    const errorCard = document.getElementById('errorCard');
+    
+    resultsSection.style.display = 'block';
+    loadingCard.style.display = 'block';
+    resultsCard.style.display = 'none';
+    errorCard.style.display = 'none';
+    
+    // Scroll to results
+    resultsSection.scrollIntoView({ behavior: 'smooth' });
+    
+    // Collect form data
+    const formData = {
+        action_id: '{{ action_id }}',
+        dateRange: document.getElementById('dateRange').value,
+        startDate: document.getElementById('startDate').value,
+        endDate: document.getElementById('endDate').value,
+        comparison: document.getElementById('comparison').value,
+        analyticsAccount: document.getElementById('analyticsAccount') ? document.getElementById('analyticsAccount').value : null,
+        searchAccount: document.getElementById('searchAccount') ? document.getElementById('searchAccount').value : null
+    };
+    
+    // Simulate API call with demo data (replace with real API call)
+    setTimeout(() => {
+        const demoResults = {
+            success: true,
+            results: {
+                traffic_sources: [
+                    {
+                        source: 'Google Organic',
+                        sessions: 15420,
+                        avg_session_duration: '03:42',
+                        bounce_rate: 34.5,
+                        pages_per_session: 3.8,
+                        quality_score: 87
+                    },
+                    {
+                        source: 'Direct Traffic',
+                        sessions: 8950,
+                        avg_session_duration: '04:15',
+                        bounce_rate: 28.2,
+                        pages_per_session: 4.2,
+                        quality_score: 92
+                    },
+                    {
+                        source: 'Facebook Ads',
+                        sessions: 6780,
+                        avg_session_duration: '02:18',
+                        bounce_rate: 52.1,
+                        pages_per_session: 2.1,
+                        quality_score: 68
+                    },
+                    {
+                        source: 'Email Campaign',
+                        sessions: 4320,
+                        avg_session_duration: '05:33',
+                        bounce_rate: 22.4,
+                        pages_per_session: 5.1,
+                        quality_score: 95
+                    },
+                    {
+                        source: 'YouTube',
+                        sessions: 3200,
+                        avg_session_duration: '03:01',
+                        bounce_rate: 41.8,
+                        pages_per_session: 3.2,
+                        quality_score: 78
+                    }
+                ],
+                ai_insights: `
+                    <strong>תובנות מפתח:</strong><br>
+                    • התנועה הישירה (Direct Traffic) מציגה את הציון הגבוה ביותר (92) עם זמן שהייה מעולה<br>
+                    • קמפיין האימייל מצטיין בביצועים יוצאי דופן עם ציון 95<br>
+                    • פרסומות פייסבוק זקוקות לאופטימיזציה - שיעור נטישה גבוה של 52.1%<br>
+                    • התנועה האורגנית מגוגל מציגה נפח גבוה עם איכות טובה
+                `,
+                recommendations: `
+                    <strong>המלצות לפעולה:</strong><br>
+                    1. <strong>השקע יותר בשיווק אימייל</strong> - הקמפיינים מציגים ROI מעולה<br>
+                    2. <strong>אופטם את קמפיינים בפייסבוק</strong> - שפר את הטארגטינג וה-landing pages<br>
+                    3. <strong>הגבר תוכן SEO</strong> - התנועה האורגנית מציגה פוטנציאל גדול<br>
+                    4. <strong>נתח את התנועה הישירה</strong> - למד מה גורם למשתמשים לחזור ישירות
+                `
+            }
+        };
+        
+        if (demoResults.success) {
+            displayResults(demoResults.results);
+        } else {
+            showError(demoResults.error || 'שגיאה לא ידועה');
+        }
+    }, 2000);
+    
+    // Real API call (uncomment when ready):
+    /*
+    fetch('/api/analyze', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            displayResults(data.results);
+        } else {
+            showError(data.error || 'שגיאה לא ידועה');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showError('שגיאה בחיבור לשרת');
+    });
+    */
+}
+
+function displayResults(results) {
+    const loadingCard = document.getElementById('loadingCard');
+    const resultsCard = document.getElementById('resultsCard');
+    
+    loadingCard.style.display = 'none';
+    resultsCard.style.display = 'block';
+    
+    // Populate table
+    const tbody = document.getElementById('resultsTableBody');
+    tbody.innerHTML = '';
+    
+    results.traffic_sources.forEach(source => {
+        const row = tbody.insertRow();
+        
+        // Create quality score badge
+        let scoreColor = source.quality_score >= 90 ? 'var(--primary-color)' : 
+                        source.quality_score >= 70 ? '#fbbf24' : '#ef4444';
+        
+        row.innerHTML = `
+            <td><strong>${source.source}</strong></td>
+            <td>${source.sessions.toLocaleString()}</td>
+            <td>${source.avg_session_duration}</td>
+            <td>${source.bounce_rate}%</td>
+            <td>${source.pages_per_session}</td>
+            <td><span style="background: ${scoreColor}; color: white; padding: 0.25rem 0.75rem; border-radius: 20px; font-weight: 600; font-size: 0.875rem;">${source.quality_score}</span></td>
+        `;
+    });
+    
+    // Display AI insights
+    document.getElementById('aiInsightsContent').innerHTML = results.ai_insights;
+    
+    // Display recommendations
+    document.getElementById('recommendationsContent').innerHTML = results.recommendations;
+}
+
+function showError(message) {
+    const loadingCard = document.getElementById('loadingCard');
+    const errorCard = document.getElementById('errorCard');
+    const errorMessage = document.getElementById('errorMessage');
+    
+    loadingCard.style.display = 'none';
+    errorCard.style.display = 'block';
+    errorMessage.textContent = message;
+}
+
+function hideResults() {
+    document.getElementById('resultsSection').style.display = 'none';
+}
+</script>
+{% endblock %}

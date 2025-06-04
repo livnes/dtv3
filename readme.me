@@ -1,0 +1,187 @@
+# 📊 DTV3 - Data Talk v3
+
+**דשבורד אנליטיקס חכם לעסקים קטנים בעברית**
+
+AI-Powered Insights from Your Google Analytics - אסיסטנט אנליטיקס חכם המחבר לחשבון Google Analytics שלך ומשתמש ב-AI כדי להפוך נתונים מורכבים לתובנות ברורות והמלצות מעשיות — הכל בעברית פשוטה.
+
+## 🎯 המשימה שלנו
+לגרום לנתונים שלך לדבר איתך — כדי שתוכל לקבל החלטות חכמות בביטחון.
+
+## ⚙️ איך זה עובד
+
+1. **💬 שאל בשפה טבעית**: המשתמש מתחאט עם האסיסטנט החכם שלנו בעברית ושואל שאלה עסקית
+2. **🧠 AI מבין את הכוונה**: הצ'אטבוט מפרש את השאלה ומתרגם אותה לשאילתת Google Analytics
+3. **🔍 משיג נתונים**: המערכת מוציאה בצורה מאובטחת את הנתונים הרלוונטיים מ-GA
+4. **🪄 AI מחזיר תשובה ידידותית**: שכבת AI נוספת מעבדת את הנתונים ומחזירה תשובה ברורה וקצרה — לעתים קרובות עם תובנות או צעדים מוצעים הבאים
+
+## 🚀 התקנה והרצה
+
+### דרישות מוקדמות
+- Python 3.8+
+- חשבון Google Cloud Console
+- חשבון Facebook Developers (אופציונלי)
+
+### 1. הכנת הסביבה
+```bash
+# שכפול הפרויקט
+git clone <your-repo-url>
+cd dtv3
+
+# יצירת virtual environment
+python3 -m venv venv
+source venv/bin/activate  # Linux/Mac
+# או
+venv\Scripts\activate     # Windows
+
+# התקנת תלויות
+pip install -r requirements.txt
+```
+
+### 2. הגדרת Google Cloud Console
+
+1. **יצירת פרויקט:**
+   - לך ל-[Google Cloud Console](https://console.cloud.google.com)
+   - צור פרויקט חדש או בחר פרויקט קיים
+
+2. **הפעלת APIs:**
+   ```
+   - Google Analytics Reporting API
+   - Google Search Console API
+   - Google OAuth2 API
+   ```
+
+3. **יצירת OAuth 2.0 Credentials:**
+   - לך ל-APIs & Services > Credentials
+   - צור OAuth 2.0 Client ID
+   - סוג אפליקציה: Web Application
+   - Authorized redirect URIs: `http://localhost:5000/auth/google/callback`
+
+### 3. הגדרת Facebook Developers (אופציונלי)
+
+1. לך ל-[Facebook Developers](https://developers.facebook.com)
+2. צור אפליקציה חדשה
+3. הוסף Facebook Login product
+4. הגדר Valid OAuth Redirect URI: `http://localhost:5000/auth/facebook/callback`
+
+### 4. הגדרת משתני סביבה
+
+```bash
+# העתק את קובץ הדוגמה
+cp .env.example .env
+
+# ערוך את .env עם הנתונים שלך:
+nano .env
+```
+
+מלא את הפרטים הבאים ב-`.env`:
+```env
+SECRET_KEY=your-generated-secret-key
+GOOGLE_CLIENT_ID=your-google-client-id
+GOOGLE_CLIENT_SECRET=your-google-client-secret
+FACEBOOK_APP_ID=your-facebook-app-id
+FACEBOOK_APP_SECRET=your-facebook-app-secret
+```
+
+### 5. הרצת האפליקציה
+
+```bash
+# הרצה בסביבת פיתוח
+python app.py
+```
+
+האפליקציה תהיה זמינה ב: `http://localhost:5000`
+
+## 📁 מבנה הפרויקט
+
+```
+dtv3/
+├── app.py                 # האפליקציה הראשית
+├── config.py             # הגדרות והגדרות OAuth
+├── database.py           # מודלים של SQLite
+├── auth.py               # לוגיקת התחברות Google/Facebook
+├── templates/            # תבניות HTML
+│   ├── base.html         # תבנית בסיס
+│   ├── login.html        # עמוד התחברות
+│   └── dashboard.html    # דשבורד ראשי
+├── static/
+│   └── style.css         # עיצוב מותאם אישית
+├── requirements.txt      # תלויות Python
+├── .env.example          # דוגמה למשתני סביבה
+├── .gitignore           # קבצים להתעלמות ב-Git
+└── README.md            # המדריך הזה
+```
+
+## 🔐 אבטחה
+
+- **OAuth 2.0**: משתמש רק בפרוטוקולי הזיהוי הרשמיים של Google ו-Facebook
+- **No Password Storage**: לא שומר סיסמאות של משתמשים
+- **Secure Tokens**: כל ה-tokens מוצפנים ונשמרים בצורה מאובטחת
+- **Environment Variables**: מפתחות רגישים נשמרים במשתני סביבה
+
+## 🛠️ פיתוח
+
+### הוספת פיצ'רים חדשים
+1. צור branch חדש: `git checkout -b feature/new-feature`
+2. פתח את השינויים שלך
+3. בדוק שהכל עובד: `python app.py`
+4. commit והעלה: `git commit -m "Add new feature"`
+
+### בדיקת סטטוס התחברות
+```bash
+# בדיקה מהיר של סטטוס API
+curl http://localhost:5000/auth/status
+```
+
+## 📊 APIs שבשימוש
+
+- **Google Analytics Reporting API v4**: לנתוני תנועה באתר
+- **Google Search Console API v1**: לנתוני SEO וחיפוש
+- **Facebook Marketing API**: לנתוני מודעות ופרסום
+
+## 🔧 פתרון בעיות נפוצות
+
+### שגיאת OAuth
+```
+Error: invalid_client
+```
+**פתרון**: בדוק שה-CLIENT_ID וה-CLIENT_SECRET נכונים ב-.env
+
+### שגיאת Redirect URI
+```
+Error: redirect_uri_mismatch
+```
+**פתרון**: ודא שה-Redirect URI ב-Google Console זהה לזה שב-config.py
+
+### שגיאת Database
+```
+Error: no such table
+```
+**פתרון**: הרץ את האפליקציה פעם ראשונה כדי ליצור את הטבלאות
+
+## 🚀 פריסה לפרודקשן
+
+1. **שנה את משתני הסביבה:**
+   ```env
+   FLASK_ENV=production
+   FLASK_DEBUG=False
+   SECRET_KEY=super-strong-production-key
+   ```
+
+2. **עדכן Redirect URIs** ב-Google Console ו-Facebook לכתובת הפרודקשן
+
+3. **השתמש ב-production database** (MySQL/PostgreSQL)
+
+## 📞 תמיכה
+
+אם נתקלת בבעיות:
+1. בדוק את הלוגים ב-terminal
+2. ודא שכל משתני הסביבה מוגדרים נכון
+3. בדוק שה-APIs מופעלים ב-Google Console
+
+## 📝 רישיון
+
+פרויקט זה מיועד לשימוש פנימי ופיתוח.
+
+---
+
+**נבנה עם ❤️ בעברית לעסקים קטנים**

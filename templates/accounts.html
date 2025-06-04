@@ -1,0 +1,295 @@
+{% extends "base.html" %}
+
+{% block title %}ניהול חשבונות - Data Talk{% endblock %}
+
+{% block content %}
+<!-- Main Header -->
+<div class="main-header">
+    <h1 class="welcome-title">ניהול חשבונות</h1>
+    <p class="welcome-subtitle">בחר את החשבונות שברצונך לחבר לדשבורד שלך</p>
+</div>
+
+<!-- Account Management Section -->
+<div class="analysis-section">
+    <!-- Action Header -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+        <div>
+            <h3 style="margin: 0; color: var(--text-primary); font-weight: 600;">חיבור חשבונות</h3>
+            <p style="margin: 0.25rem 0 0 0; color: var(--text-secondary); font-size: 0.875rem;">חבר את חשבונות Google ו-Facebook כדי להתחיל לקבל תובנות</p>
+        </div>
+        <a href="{{ url_for('refresh_accounts') }}" class="btn btn-outline">
+            <i class="fas fa-sync"></i>
+            רענן חשבונות
+        </a>
+    </div>
+
+    <!-- Connection Status Cards -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+        
+        <!-- Google Services Card -->
+        <div class="insight-card" style="position: relative;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem;">
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                    <div style="width: 3rem; height: 3rem; border-radius: 50%; background: #db4437; display: flex; align-items: center; justify-content: center;">
+                        <i class="fab fa-google" style="color: white; font-size: 1.25rem;"></i>
+                    </div>
+                    <div>
+                        <h6 style="margin: 0; color: var(--text-primary); font-weight: 600;">Google Services</h6>
+                        <p style="margin: 0; color: var(--text-secondary); font-size: 0.875rem;">Analytics & Search Console</p>
+                    </div>
+                </div>
+                
+                {% if google_connected %}
+                    <span style="background: #dcfce7; color: #16a34a; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.8rem; font-weight: 500;">
+                        <i class="fas fa-check" style="margin-left: 0.25rem;"></i>מחובר
+                    </span>
+                {% else %}
+                    <span style="background: #fee2e2; color: #dc2626; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.8rem; font-weight: 500;">
+                        <i class="fas fa-times" style="margin-left: 0.25rem;"></i>לא מחובר
+                    </span>
+                {% endif %}
+            </div>
+            
+            {% if not google_connected %}
+                <div style="background: #fef3c7; border: 1px solid #fde68a; border-radius: 8px; padding: 1rem; margin-bottom: 1rem;">
+                    <p style="margin: 0; color: #d97706; font-size: 0.875rem;">
+                        <i class="fas fa-exclamation-triangle" style="margin-left: 0.5rem;"></i>
+                        יש להתחבר לGoogle כדי לנהל חשבונות Analytics ו-Search Console
+                    </p>
+                </div>
+                <a href="{{ url_for('auth.google_login') }}" class="btn btn-primary" style="width: 100%;">
+                    <i class="fab fa-google"></i>
+                    התחבר לGoogle
+                </a>
+            {% else %}
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                    <div style="text-align: center; padding: 0.75rem; background: var(--background); border: 1px solid var(--border-color); border-radius: 8px;">
+                        <div style="font-size: 1.5rem; font-weight: 700; color: var(--primary-color);">{{ analytics_accounts|length }}</div>
+                        <div style="font-size: 0.8rem; color: var(--text-secondary);">Analytics</div>
+                    </div>
+                    <div style="text-align: center; padding: 0.75rem; background: var(--background); border: 1px solid var(--border-color); border-radius: 8px;">
+                        <div style="font-size: 1.5rem; font-weight: 700; color: var(--primary-color);">{{ search_console_accounts|length }}</div>
+                        <div style="font-size: 0.8rem; color: var(--text-secondary);">Search Console</div>
+                    </div>
+                </div>
+                <button onclick="reconnectGoogle()" class="btn btn-secondary" style="width: 100%;">
+                    <i class="fas fa-sync"></i>
+                    חבר מחדש
+                </button>
+            {% endif %}
+        </div>
+
+        <!-- Facebook Services Card -->
+        <div class="insight-card">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem;">
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                    <div style="width: 3rem; height: 3rem; border-radius: 50%; background: #1877f2; display: flex; align-items: center; justify-content: center;">
+                        <i class="fab fa-facebook" style="color: white; font-size: 1.25rem;"></i>
+                    </div>
+                    <div>
+                        <h6 style="margin: 0; color: var(--text-primary); font-weight: 600;">Facebook Ads</h6>
+                        <p style="margin: 0; color: var(--text-secondary); font-size: 0.875rem;">מודעות ופרסום</p>
+                    </div>
+                </div>
+                
+                {% if facebook_connected %}
+                    <span style="background: #dcfce7; color: #16a34a; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.8rem; font-weight: 500;">
+                        <i class="fas fa-check" style="margin-left: 0.25rem;"></i>מחובר
+                    </span>
+                {% else %}
+                    <span style="background: #f3f4f6; color: var(--text-muted); padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.8rem; font-weight: 500;">
+                        <i class="fas fa-times" style="margin-left: 0.25rem;"></i>לא מחובר
+                    </span>
+                {% endif %}
+            </div>
+            
+            {% if google_connected %}
+                {% if not facebook_connected %}
+                    <a href="{{ url_for('auth.facebook_login') }}" class="btn" style="background: #1877f2; color: white; width: 100%;">
+                        <i class="fab fa-facebook"></i>
+                        התחבר לFacebook Ads
+                    </a>
+                {% else %}
+                    <div style="text-align: center; padding: 1rem; background: var(--background); border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 1rem;">
+                        <div style="font-size: 1.5rem; font-weight: 700; color: var(--primary-color);">{{ facebook_accounts|length }}</div>
+                        <div style="font-size: 0.8rem; color: var(--text-secondary);">Facebook Accounts</div>
+                    </div>
+                    <button onclick="reconnectFacebook()" class="btn btn-secondary" style="width: 100%;">
+                        <i class="fas fa-sync"></i>
+                        חבר מחדש
+                    </button>
+                {% endif %}
+            {% else %}
+                <p style="margin: 0; color: var(--text-muted); font-size: 0.875rem; text-align: center; padding: 1.5rem;">
+                    דורש התחברות לGoogle קודם
+                </p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Connected Accounts -->
+    {% if google_connected and (analytics_accounts or search_console_accounts) %}
+    <div class="results-container">
+        <div class="results-header">
+            <i class="fas fa-link"></i>
+            <h3>חשבונות מחוברים</h3>
+        </div>
+
+        <!-- Analytics Accounts -->
+        {% if analytics_accounts %}
+        <div style="margin-bottom: 2rem;">
+            <h6 style="color: var(--text-primary); margin-bottom: 1rem; font-weight: 600; display: flex; align-items: center; gap: 0.5rem;">
+                <i class="fas fa-chart-bar" style="color: var(--primary-color);"></i>
+                Google Analytics Properties
+            </h6>
+            <div style="display: grid; gap: 1rem;">
+                {% for account in analytics_accounts %}
+                <div style="display: flex; align-items: center; justify-content: space-between; padding: 1rem; background: var(--background-secondary); border: 1px solid var(--border-color); border-radius: 8px;">
+                    <div>
+                        <h6 style="margin: 0 0 0.25rem 0; color: var(--text-primary); font-weight: 500;">{{ account.account_name }}</h6>
+                        {% if account.website_url %}
+                            <p style="margin: 0 0 0.25rem 0; color: var(--text-secondary); font-size: 0.8rem;">
+                                <i class="fas fa-globe" style="margin-left: 0.25rem;"></i>
+                                {{ account.website_url }}
+                            </p>
+                        {% endif %}
+                        <p style="margin: 0; color: var(--text-muted); font-size: 0.75rem;">Property ID: {{ account.account_id }}</p>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                        {% if account.is_active %}
+                            <span style="background: #dcfce7; color: #16a34a; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: 500;">
+                                <i class="fas fa-check" style="margin-left: 0.25rem;"></i>פעיל
+                            </span>
+                        {% else %}
+                            <span style="background: #f3f4f6; color: var(--text-muted); padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: 500;">
+                                <i class="fas fa-pause" style="margin-left: 0.25rem;"></i>מושבת
+                            </span>
+                        {% endif %}
+                        <label style="position: relative; display: inline-block; width: 3rem; height: 1.5rem;">
+                            <input type="checkbox" 
+                                   {% if account.is_active %}checked{% endif %}
+                                   onchange="toggleAccount(event, {{ account.id }})"
+                                   style="opacity: 0; width: 0; height: 0;">
+                            <span style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: {% if account.is_active %}var(--primary-color){% else %}#ccc{% endif %}; transition: .4s; border-radius: 1.5rem;"></span>
+                            <span style="position: absolute; content: ''; height: 1.125rem; width: 1.125rem; left: {% if account.is_active %}1.6875rem{% else %}0.1875rem{% endif %}; bottom: 0.1875rem; background-color: white; transition: .4s; border-radius: 50%;"></span>
+                        </label>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Search Console Accounts -->
+        {% if search_console_accounts %}
+        <div style="margin-bottom: 2rem;">
+            <h6 style="color: var(--text-primary); margin-bottom: 1rem; font-weight: 600; display: flex; align-items: center; gap: 0.5rem;">
+                <i class="fas fa-search" style="color: var(--primary-color);"></i>
+                Google Search Console Sites
+            </h6>
+            <div style="display: grid; gap: 1rem;">
+                {% for account in search_console_accounts %}
+                <div style="display: flex; align-items: center; justify-content: space-between; padding: 1rem; background: var(--background-secondary); border: 1px solid var(--border-color); border-radius: 8px;">
+                    <div>
+                        <h6 style="margin: 0 0 0.25rem 0; color: var(--text-primary); font-weight: 500;">{{ account.website_url }}</h6>
+                        <p style="margin: 0; color: var(--text-muted); font-size: 0.75rem;">{{ account.account_name }}</p>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                        {% if account.is_active %}
+                            <span style="background: #dcfce7; color: #16a34a; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: 500;">
+                                <i class="fas fa-check" style="margin-left: 0.25rem;"></i>פעיל
+                            </span>
+                        {% else %}
+                            <span style="background: #f3f4f6; color: var(--text-muted); padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: 500;">
+                                <i class="fas fa-pause" style="margin-left: 0.25rem;"></i>מושבת
+                            </span>
+                        {% endif %}
+                        <label style="position: relative; display: inline-block; width: 3rem; height: 1.5rem;">
+                            <input type="checkbox" 
+                                   {% if account.is_active %}checked{% endif %}
+                                   onchange="toggleAccount(event, {{ account.id }})"
+                                   style="opacity: 0; width: 0; height: 0;">
+                            <span style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: {% if account.is_active %}var(--primary-color){% else %}#ccc{% endif %}; transition: .4s; border-radius: 1.5rem;"></span>
+                            <span style="position: absolute; content: ''; height: 1.125rem; width: 1.125rem; left: {% if account.is_active %}1.6875rem{% else %}0.1875rem{% endif %}; bottom: 0.1875rem; background-color: white; transition: .4s; border-radius: 50%;"></span>
+                        </label>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <!-- No Accounts Message -->
+    {% if not analytics_accounts and not search_console_accounts and google_connected %}
+    <div class="results-container" style="text-align: center; padding: 3rem 2rem;">
+        <i class="fas fa-exclamation-circle" style="font-size: 3rem; color: #f59e0b; margin-bottom: 1rem;"></i>
+        <h4 style="margin-bottom: 1rem; color: var(--text-primary);">לא נמצאו חשבונות</h4>
+        <p style="color: var(--text-secondary); margin-bottom: 2rem; max-width: 500px; margin-left: auto; margin-right: auto;">
+            לא מצאנו חשבונות Analytics או Search Console המשויכים לחשבון Google שלך.<br>
+            ודא שיש לך גישה לחשבונות אלה ונסה לרענן.
+        </p>
+        <a href="{{ url_for('refresh_accounts') }}" class="btn btn-primary">
+            <i class="fas fa-sync"></i>
+            רענן שוב
+        </a>
+    </div>
+    {% endif %}
+
+    <!-- Action Buttons -->
+    <div style="text-align: center; margin-top: 2rem;">
+        <a href="{{ url_for('dashboard') }}" class="btn btn-secondary" style="margin-left: 1rem;">
+            <i class="fas fa-arrow-right"></i>
+            חזור לדשבורד
+        </a>
+        {% set active_analytics = analytics_accounts|selectattr('is_active')|list %}
+        {% set active_search = search_console_accounts|selectattr('is_active')|list %}
+        {% if active_analytics or active_search %}
+        <a href="{{ url_for('dashboard') }}" class="btn btn-primary">
+            <i class="fas fa-comments"></i>
+            התחל לשאול שאלות
+        </a>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+function toggleAccount(event, accountId) {
+    const checkbox = event.target;
+    checkbox.disabled = true;
+
+    fetch(`/accounts/toggle/${accountId}`, {
+        method: 'GET'
+    })
+    .then(response => {
+        if (response.ok) {
+            window.location.reload();
+        } else {
+            alert('שגיאה בעדכון החשבון');
+            checkbox.checked = !checkbox.checked;
+        }
+    })
+    .catch(error => {
+        alert('שגיאה בעדכון החשבון');
+        console.error('Error:', error);
+        checkbox.checked = !checkbox.checked;
+    })
+    .finally(() => {
+        checkbox.disabled = false;
+    });
+}
+
+function reconnectGoogle() {
+    if (confirm('האם אתה בטוח שברצונך להתחבר מחדש לGoogle?')) {
+        window.location.href = "{{ url_for('auth.google_login') }}";
+    }
+}
+
+function reconnectFacebook() {
+    if (confirm('האם אתה בטוח שברצונך להתחבר מחדש לFacebook?')) {
+        window.location.href = "{{ url_for('auth.facebook_login') }}";
+    }
+}
+</script>
+{% endblock %}

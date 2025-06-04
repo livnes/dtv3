@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>התחברות - Data Talk</title>
+    
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet">
+</head>
+<body style="display: flex; align-items: center; justify-content: center; min-height: 100vh; background: var(--background);">
+    
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="flash-messages" style="position: fixed; top: 1rem; right: 50%; transform: translateX(50%); z-index: 9999; max-width: 400px;">
+                {% for category, message in messages %}
+                    <div class="flash-message flash-{{ category }}" style="background: {% if category == 'error' %}#fee2e2; color: #dc2626; border: 1px solid #fecaca;{% elif category == 'warning' %}#fef3c7; color: #d97706; border: 1px solid #fde68a;{% elif category == 'info' %}#dbeafe; color: #2563eb; border: 1px solid #bfdbfe;{% else %}#dcfce7; color: #16a34a; border: 1px solid #bbf7d0;{% endif %} padding: 0.75rem 1rem; border-radius: 8px; margin-bottom: 0.5rem; font-size: 0.875rem; box-shadow: var(--shadow-md);">
+                        <i class="fas fa-{% if category == 'error' %}exclamation-triangle{% elif category == 'warning' %}exclamation-circle{% elif category == 'info' %}info-circle{% else %}check-circle{% endif %} me-2"></i>
+                        {{ message }}
+                        <button type="button" onclick="this.parentElement.remove()" style="float: left; background: none; border: none; font-size: 1.25rem; cursor: pointer; color: inherit; opacity: 0.7;">×</button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <div style="max-width: 480px; width: 100%; margin: 0 1rem;">
+        <!-- Login Card -->
+        <div style="background: var(--background); border: 1px solid var(--border-color); border-radius: 16px; padding: 3rem 2rem; box-shadow: var(--shadow-md); text-align: center;">
+            
+            <!-- Logo and Title -->
+            <div style="margin-bottom: 2rem;">
+                <div style="display: inline-flex; align-items: center; justify-content: center; width: 4rem; height: 4rem; background: var(--primary-color); border-radius: 50%; margin-bottom: 1rem;">
+                    <i class="fas fa-chart-line" style="font-size: 1.5rem; color: white;"></i>
+                </div>
+                <h1 style="font-size: 2rem; font-weight: 700; color: var(--text-primary); margin: 0 0 0.5rem 0;">Data Talk</h1>
+                <p style="color: var(--text-secondary); margin: 0; font-size: 1rem;">דשבורד אנליטיקס חכם לעסקים קטנים</p>
+            </div>
+
+            <!-- Mission Statement -->
+            <div style="background: var(--background-secondary); border: 1px solid var(--border-color); border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem;">
+                <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 0.75rem;">
+                    <i class="fas fa-bullseye" style="color: var(--primary-color); margin-left: 0.5rem;"></i>
+                    <strong style="color: var(--text-primary);">המשימה שלנו:</strong>
+                </div>
+                <p style="margin: 0; color: var(--text-secondary); font-size: 0.95rem; line-height: 1.5;">
+                    לגרום לנתונים שלך לדבר איתך - כדי שתוכל לקבל החלטות חכמות בביטחון
+                </p>
+            </div>
+
+            <!-- Login Instructions -->
+            <div style="margin-bottom: 2rem;">
+                <h3 style="color: var(--text-primary); margin-bottom: 1rem; font-size: 1.25rem; font-weight: 600;">
+                    <i class="fas fa-plug" style="color: var(--primary-color); margin-left: 0.5rem;"></i>
+                    התחבר לחשבונות שלך
+                </h3>
+                <p style="color: var(--text-secondary); margin: 0; font-size: 0.9rem;">
+                    התחבר עם Google כדי לגשת ל-Analytics ו-Search Console שלך
+                </p>
+            </div>
+
+            <!-- Google Login Button -->
+            <div style="margin-bottom: 2rem;">
+                <a href="{{ url_for('auth.google_login') }}" style="display: inline-flex; align-items: center; justify-content: center; gap: 0.75rem; width: 100%; padding: 1rem 1.5rem; background: #db4437; color: white; text-decoration: none; border-radius: 12px; font-weight: 500; font-size: 1rem; transition: all 0.2s ease; box-shadow: var(--shadow-sm);" 
+                   onmouseover="this.style.background='#c23321'; this.style.transform='translateY(-2px)'; this.style.boxShadow='var(--shadow-md)'" 
+                   onmouseout="this.style.background='#db4437'; this.style.transform='translateY(0)'; this.style.boxShadow='var(--shadow-sm)'">
+                    <i class="fab fa-google" style="font-size: 1.25rem;"></i>
+                    התחבר עם Google
+                </a>
+            </div>
+
+            <!-- Features List -->
+            <div style="margin-bottom: 2rem;">
+                <h6 style="text-align: center; margin-bottom: 1rem; color: var(--text-primary); font-weight: 600;">מה תקבל:</h6>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; text-align: right;">
+                    <div style="display: flex; align-items: flex-start; gap: 0.5rem;">
+                        <i class="fas fa-chart-bar" style="color: var(--primary-color); margin-top: 0.25rem; flex-shrink: 0;"></i>
+                        <div>
+                            <strong style="color: var(--text-primary); font-size: 0.875rem;">Google Analytics</strong>
+                            <p style="margin: 0; color: var(--text-secondary); font-size: 0.8rem;">נתוני תנועה באתר</p>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; align-items: flex-start; gap: 0.5rem;">
+                        <i class="fas fa-search" style="color: var(--primary-color); margin-top: 0.25rem; flex-shrink: 0;"></i>
+                        <div>
+                            <strong style="color: var(--text-primary); font-size: 0.875rem;">Search Console</strong>
+                            <p style="margin: 0; color: var(--text-secondary); font-size: 0.8rem;">נתוני SEO וחיפוש</p>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; align-items: flex-start; gap: 0.5rem;">
+                        <i class="fab fa-facebook" style="color: var(--primary-color); margin-top: 0.25rem; flex-shrink: 0;"></i>
+                        <div>
+                            <strong style="color: var(--text-primary); font-size: 0.875rem;">Facebook Ads</strong>
+                            <p style="margin: 0; color: var(--text-secondary); font-size: 0.8rem;">נתוני מודעות ופרסום</p>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; align-items: flex-start; gap: 0.5rem;">
+                        <i class="fas fa-comments" style="color: var(--primary-color); margin-top: 0.25rem; flex-shrink: 0;"></i>
+                        <div>
+                            <strong style="color: var(--text-primary); font-size: 0.875rem;">AI בעברית</strong>
+                            <p style="margin: 0; color: var(--text-secondary); font-size: 0.8rem;">תובנות ברורות והמלצות</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Security Note -->
+            <div style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 1rem; margin-bottom: 2rem;">
+                <div style="display: flex; align-items: flex-start; gap: 0.5rem;">
+                    <i class="fas fa-shield-alt" style="color: #2563eb; margin-top: 0.125rem; flex-shrink: 0;"></i>
+                    <div style="text-align: right;">
+                        <strong style="color: #1e40af; font-size: 0.875rem;">בטוח ומאובטח:</strong>
+                        <p style="margin: 0.25rem 0 0 0; color: #1e40af; font-size: 0.8rem; line-height: 1.4;">
+                            אנחנו משתמשים רק בפרוטוקולי OAuth הרשמיים. לא נשמור את הסיסמאות שלך ולא נקבל גישה מלאה לחשבונות.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Process Steps -->
+        <div style="margin-top: 1.5rem; background: var(--background-secondary); border: 1px solid var(--border-color); border-radius: 12px; padding: 1.5rem;">
+            <h6 style="text-align: center; margin-bottom: 1rem; color: var(--text-primary); font-weight: 600;">
+                <i class="fas fa-cogs" style="margin-left: 0.5rem;"></i>
+                איך זה עובד?
+            </h6>
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; text-align: center;">
+                <div>
+                    <div style="margin-bottom: 0.5rem;">
+                        <i class="fas fa-comments" style="font-size: 1.5rem; color: var(--primary-color);"></i>
+                    </div>
+                    <small style="color: var(--text-secondary); font-size: 0.8rem;">שאל בעברית</small>
+                </div>
+                <div>
+                    <div style="margin-bottom: 0.5rem;">
+                        <i class="fas fa-brain" style="font-size: 1.5rem; color: var(--primary-color);"></i>
+                    </div>
+                    <small style="color: var(--text-secondary); font-size: 0.8rem;">AI מבין</small>
+                </div>
+                <div>
+                    <div style="margin-bottom: 0.5rem;">
+                        <i class="fas fa-database" style="font-size: 1.5rem; color: var(--primary-color);"></i>
+                    </div>
+                    <small style="color: var(--text-secondary); font-size: 0.8rem;">משיג נתונים</small>
+                </div>
+                <div>
+                    <div style="margin-bottom: 0.5rem;">
+                        <i class="fas fa-magic" style="font-size: 1.5rem; color: var(--primary-color);"></i>
+                    </div>
+                    <small style="color: var(--text-secondary); font-size: 0.8rem;">מחזיר תובנות</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Auto-hide flash messages
+        document.addEventListener('DOMContentLoaded', function() {
+            const flashMessages = document.querySelectorAll('.flash-message');
+            flashMessages.forEach(function(message) {
+                setTimeout(function() {
+                    message.style.opacity = '0';
+                    message.style.transform = 'translateY(-20px)';
+                    setTimeout(function() {
+                        message.remove();
+                    }, 300);
+                }, 5000);
+            });
+        });
+
+        function toggleAccount(event, accountId) {
+            const checkbox = event.target;
+            checkbox.disabled = true;
+
+            fetch(`/accounts/toggle/${accountId}`, {
+                method: 'GET'
+            })
+            .then(response => {
+                if (response.ok) {
+                    window.location.reload();
+                } else {
+                    alert('שגיאה בעדכון החשבון');
+                    checkbox.checked = !checkbox.checked;
+                }
+            })
+            .catch(error => {
+                alert('שגיאה בעדכון החשבון');
+                console.error('Error:', error);
+                checkbox.checked = !checkbox.checked;
+            })
+            .finally(() => {
+                checkbox.disabled = false;
+            });
+        }
+    </script>
+
+</body>
+</html>
