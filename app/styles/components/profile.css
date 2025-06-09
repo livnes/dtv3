@@ -1,0 +1,143 @@
+@reference "tailwindcss";
+
+@layer components {
+    .profile-container {
+        @apply max-w-6xl mx-auto px-4 py-8;
+    }
+
+    .profile-header {
+        @apply text-center mb-8;
+    }
+
+    .profile-title {
+        @apply text-4xl font-bold text-gray-800 mb-2 sm:text-3xl;
+    }
+
+    .profile-subtitle {
+        @apply text-lg text-gray-600 mb-8;
+    }
+
+    .profile-overview-card {
+        @apply bg-white border border-gray-200 rounded-xl p-6 mb-8 shadow-sm;
+    }
+
+    .user-info-section {
+        @apply flex items-center gap-6 mb-6 flex-col sm:flex-row;
+    }
+
+    .profile-avatar {
+        @apply w-20 h-20 rounded-full bg-blue-500 flex items-center justify-center text-3xl font-bold text-white;
+    }
+
+    .user-details {
+        @apply flex-1 text-center sm:text-left;
+    }
+
+    .user-name {
+        @apply text-2xl font-semibold text-gray-800 mb-2;
+    }
+
+    .user-email {
+        @apply text-lg text-gray-600 mb-3;
+    }
+
+    .status-badges {
+        @apply flex gap-3 flex-wrap justify-center sm:justify-start;
+    }
+
+    .status-badge {
+        @apply px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1;
+    }
+
+    .status-badge-verified {
+        @apply bg-green-100 text-green-700;
+    }
+
+    .status-badge-member {
+        @apply bg-blue-100 text-blue-700;
+    }
+
+    .content-grid {
+        @apply grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8;
+    }
+
+    .stats-grid {
+        @apply grid grid-cols-2 md:grid-cols-4 gap-4;
+    }
+
+    .stat-item {
+        @apply text-center p-4 bg-white border border-gray-200 rounded-lg;
+    }
+
+    .stat-value {
+        @apply text-2xl font-bold text-blue-500 mb-1;
+    }
+
+    .stat-label {
+        @apply text-xs text-gray-600;
+    }
+
+    .services-card {
+        @apply bg-white border border-gray-200 rounded-xl p-6 mb-8 shadow-sm;
+    }
+
+    .services-list {
+        @apply flex flex-col gap-4;
+    }
+
+    .service-item {
+        @apply flex items-center justify-between p-4 bg-gray-50 border border-gray-200 rounded-xl;
+    }
+
+    .service-info {
+        @apply flex items-center gap-4;
+    }
+
+    .service-icon {
+        @apply w-12 h-12 rounded-full flex items-center justify-center text-xl text-white;
+    }
+
+    .service-details {
+        @apply flex flex-col gap-1;
+    }
+
+    .service-name {
+        @apply font-semibold text-gray-800;
+    }
+
+    .service-description {
+        @apply text-sm text-gray-600;
+    }
+
+    .service-status {
+        @apply px-4 py-2 rounded-full text-sm font-medium flex items-center gap-1;
+    }
+
+    .service-status-connected {
+        @apply bg-green-100 text-green-700;
+    }
+
+    .service-status-disconnected {
+        @apply bg-gray-100 text-gray-400;
+    }
+
+    .actions-grid {
+        @apply grid grid-cols-1 md:grid-cols-2 gap-4 mb-8;
+    }
+
+    .edit-controls {
+        @apply flex items-center gap-3 mt-4;
+    }
+
+    .danger-zone {
+        @apply border border-red-200 rounded-xl p-6 bg-red-50;
+    }
+
+    .danger-title {
+        @apply text-red-600 font-semibold flex items-center gap-2 mb-4;
+    }
+
+    .danger-description {
+        @apply text-red-800 text-sm leading-relaxed mb-4;
+    }
+}

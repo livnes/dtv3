@@ -1,0 +1,87 @@
+@reference "tailwindcss";
+
+@layer components {
+    .info-card {
+        @apply bg-gray-50 border border-gray-200 rounded-xl p-6 mb-8 shadow-sm;
+    }
+
+    .actions-card {
+        @apply bg-white border border-gray-200 rounded-xl p-6 mb-8 shadow-sm transition-all hover:shadow-md;
+    }
+
+    .card-header {
+        @apply flex items-center gap-0.5 mb-6;
+    }
+
+    .card-title {
+        @apply text-lg font-semibold text-gray-800;
+    }
+
+    .section-header {
+        @apply flex items-center gap-3 mb-6 pb-4 border-b border-gray-200;
+    }
+
+    .section-title {
+        @apply text-xl font-semibold text-gray-800;
+    }
+
+    .cards-grid {
+        @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-8;
+    }
+
+    .insight-card {
+        @apply bg-white border border-gray-200 rounded-xl p-6 shadow-sm transition-all hover:shadow-md;
+    }
+
+    .insight-card h6 {
+        @apply text-lg font-semibold text-gray-800 mb-3;
+    }
+
+    .platform-header {
+        @apply flex items-center justify-between mb-6;
+    }
+
+    .platform-brand {
+        @apply flex items-center gap-4;
+    }
+
+    .platform-icon {
+        @apply w-12 h-12 rounded-full flex items-center justify-center text-xl font-bold text-white;
+    }
+
+    .platform-icon.google {
+        @apply bg-red-500;
+    }
+
+    .platform-icon.facebook {
+        @apply bg-blue-600;
+    }
+
+    .platform-icon.tiktok {
+        @apply bg-black;
+    }
+
+    .platform-details h6 {
+        @apply text-lg font-semibold text-gray-800 m-0;
+    }
+
+    .platform-details p {
+        @apply text-sm text-gray-600 m-0;
+    }
+
+    .analysis-section {
+        @apply p-8;
+    }
+
+    .results-container {
+        @apply max-w-6xl mx-auto;
+    }
+
+    .results-header {
+        @apply flex items-center gap-3 mb-8 pb-4 border-b border-gray-200;
+    }
+
+    .results-header h3 {
+        @apply text-2xl font-bold text-gray-800 m-0;
+    }
+}

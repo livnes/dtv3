@@ -1,0 +1,43 @@
+@reference "tailwindcss";
+
+@layer components {
+    .btn {
+        @apply inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-medium text-center cursor-pointer border transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed;
+    }
+
+    .btn-primary {
+        @apply inline-flex items-center gap-2 px-6 py-3 rounded-lg font-medium text-white bg-blue-500 transition-all hover:bg-blue-600 hover:-translate-y-0.5 hover:shadow-md;
+    }
+
+    .btn-secondary {
+        @apply inline-flex items-center gap-2 px-6 py-3 rounded-lg font-medium text-gray-600 bg-gray-50 border border-gray-200 transition-all hover:bg-gray-100 hover:text-gray-800;
+    }
+
+    .btn-outline {
+        @apply inline-flex items-center gap-2 px-6 py-3 rounded-lg font-medium text-blue-500 border border-blue-500 transition-all hover:bg-blue-500 hover:text-white;
+    }
+
+    .btn-danger {
+        @apply inline-flex items-center gap-2 px-6 py-3 rounded-lg font-medium text-white bg-red-500 transition-all hover:bg-red-600;
+    }
+
+    .btn-google {
+        @apply inline-flex items-center gap-2 px-6 py-3 rounded-lg font-medium text-white bg-red-500 transition-all hover:bg-red-600;
+    }
+
+    .btn-facebook {
+        @apply inline-flex items-center gap-2 px-6 py-3 rounded-lg font-medium text-white bg-blue-600 transition-all hover:bg-blue-700;
+    }
+
+    .btn-tiktok {
+        @apply inline-flex items-center gap-2 px-6 py-3 rounded-lg font-medium text-white bg-black transition-all hover:bg-gray-800;
+    }
+
+    .button-full-width {
+        @apply w-full;
+    }
+
+    .button-grid {
+        @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4;
+    }
+}

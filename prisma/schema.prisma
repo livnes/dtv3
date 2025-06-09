@@ -1,0 +1,287 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// NextAuth.js required models
+model Account {
+  id                       String  @id @default(cuid())
+  userId                   String
+  type                     String
+  provider                 String
+  providerAccountId        String
+  refresh_token            String? @db.Text
+  access_token             String? @db.Text
+  expires_at               Int?
+  refresh_token_expires_in Int?
+  token_type               String?
+  scope                    String?
+  id_token                 String? @db.Text
+  session_state            String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+// Updated User model for NextAuth compatibility
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  isVerified    Boolean   @default(true)  // Admin verification status
+  isDeleted     Boolean   @default(false)  // Soft delete flag
+  createdAt     DateTime  @default(now())
+
+  // NextAuth relations
+  accounts Account[]
+  sessions Session[]
+
+  // Custom relations
+  integrations UserIntegration[]
+  insights     AIInsight[]
+  profile      UserProfile?
+
+  @@map("users")
+  @@index([isVerified])
+  @@index([isDeleted])
+  @@index([isVerified, isDeleted])
+}
+
+model UserIntegration {
+  id                    Int       @id @default(autoincrement())
+  userId                String    // Changed to String to match User.id
+  providerName          String    // 'google_analytics', 'google_search_console', 'facebook_ads', 'tiktok_ads'
+  accountId             String
+  accountName           String?   // Account display name (e.g., "חשבון חדש פרי גנך")
+  propertyName          String?   // Property display name (e.g., "פרי גנך - GA4")
+  encryptedAccessToken  String
+  encryptedRefreshToken String?
+  tokenExpiresAt        DateTime?
+  scopes                String    // JSON string of scopes
+  backfillCompleted     Boolean   @default(false)
+  lastFetchAt          DateTime?
+  lastError            String?
+  isActive             Boolean   @default(true)
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+
+  // Relations
+  user                User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  campaignMetrics     DailyCampaignMetrics[]
+  adMetrics          DailyAdMetrics[]
+  trafficSourceMetrics DailyTrafficSourceMetrics[]
+
+  @@map("user_integrations")
+  @@unique([userId, providerName])
+  @@index([userId, providerName])
+  @@index([providerName, isActive])
+}
+
+model DailyCampaignMetrics {
+  id                  Int       @id @default(autoincrement())
+  userId              String    // Changed to String to match User.id
+  integrationId       Int
+  campaignId          String
+  campaignName        String
+  providerName        String
+  date                DateTime  @db.Date
+  sessions            Int       @default(0)
+  users               Int       @default(0)
+  pageviews           Int       @default(0)
+  bounceRate          Float     @default(0)
+  avgSessionDuration  Float     @default(0)
+  pagesPerSession     Float     @default(0)
+  engagedSessions     Int       @default(0)
+  revenue             Float     @default(0)
+  deviceCategory      String?
+  country             String?
+  userType            String?
+  qualityScore        Int?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  // Relations
+  integration UserIntegration @relation(fields: [integrationId], references: [id], onDelete: Cascade)
+
+  @@map("daily_campaign_metrics")
+  @@unique([integrationId, campaignId, date])
+  @@index([userId, date])
+  @@index([providerName, date])
+}
+
+model DailyAdMetrics {
+  id               Int       @id @default(autoincrement())
+  userId           String    // Changed to String to match User.id
+  integrationId    Int
+  adId             String
+  adName           String
+  campaignId       String
+  campaignName     String
+  providerName     String
+  date             DateTime  @db.Date
+  impressions      Int       @default(0)
+  clicks           Int       @default(0)
+  spend            Float     @default(0)
+  ctr              Float     @default(0)
+  cpc              Float     @default(0)
+  cpm              Float     @default(0)
+  conversions      Int       @default(0)
+  reach            Int       @default(0)
+  frequency        Float     @default(0)
+  videoViews25     Int       @default(0)
+  videoViews50     Int       @default(0)
+  videoViews75     Int       @default(0)
+  videoViews100    Int       @default(0)
+  websiteClicks    Int       @default(0)
+  roas             Float     @default(0)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  // Relations
+  integration UserIntegration @relation(fields: [integrationId], references: [id], onDelete: Cascade)
+
+  @@map("daily_ad_metrics")
+  @@unique([integrationId, adId, date])
+  @@index([userId, date])
+  @@index([providerName, date])
+}
+
+model AIInsight {
+  id                 Int      @id @default(autoincrement())
+  userId             String   // Changed to String to match User.id
+  actionId           String
+  insightHtml        String   @db.Text
+  recommendationHtml String   @db.Text
+  createdAt         DateTime @default(now())
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("ai_insights")
+  @@index([userId, actionId])
+  @@index([userId, createdAt])
+}
+
+model LogEntry {
+  id        Int      @id @default(autoincrement())
+  level     String   // 'info', 'warn', 'error'
+  message   String
+  context   String?  @db.Text // JSON string
+  createdAt DateTime @default(now())
+
+  @@map("log_entries")
+  @@index([level, createdAt])
+}
+
+model DailyTrafficSourceMetrics {
+  id                  Int       @id @default(autoincrement())
+  userId              String    
+  integrationId       Int
+  propertyId          String    // GA4 Property ID
+  date                DateTime  @db.Date
+  
+  // Traffic Source Info
+  channelGroup        String    // e.g., "Organic Search", "Direct", "Social"
+  sourceMedium        String    // e.g., "google / organic"
+  
+  // Core Metrics
+  sessions            Int       @default(0)
+  users               Int       @default(0)
+  bounceRate          Float     @default(0)
+  avgSessionDuration  Float     @default(0) // in seconds
+  pagesPerSession     Float     @default(0)
+  conversions         Int       @default(0)
+  
+  // Calculated Fields
+  qualityScore        Int?      // 0-100 calculated score
+  
+  // Metadata
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  // Relations
+  integration UserIntegration @relation(fields: [integrationId], references: [id], onDelete: Cascade)
+
+  @@map("daily_traffic_source_metrics")
+  @@unique([integrationId, propertyId, date, sourceMedium])
+  @@index([userId, date])
+  @@index([propertyId, date])
+  @@index([channelGroup, date])
+}
+
+// Onboarding wizard profile model
+model UserProfile {
+  id                      String   @id @default(cuid())
+  userId                  String   @unique
+  
+  // Step 1: Contact Details
+  fullName                String?
+  phoneNumber             String?
+  businessEmail           String?  // Business email (optional, different from signup email)
+  businessName            String?
+  websiteUrl              String?
+  facebookUrl             String?
+  instagramUrl            String?
+  linkedinUrl             String?
+  tiktokUrl               String?  // Separate from LinkedIn
+  
+  // Step 2: Goals and Marketing
+  dataGoals               String[] // Array of selected goals
+  mainMarketingObjective  String?  // Single selection
+  businessAge             String?  // Business duration
+  marketingPlatforms      String[] // Marketing platforms used (renamed from currentPlatforms)
+  marketingKnowledgeLevel String?  // Marketing expertise level
+  
+  // Step 3: Data Sources
+  currentDataSources      String[] // Measurement systems in use
+  crmSystem              String?   // CRM or email system name
+  
+  // Profile completion status
+  step1Completed         Boolean  @default(false)
+  step2Completed         Boolean  @default(false)
+  step3Completed         Boolean  @default(false)
+  isOnboardingCompleted  Boolean  @default(false)
+  isOnboardingSkipped    Boolean  @default(false)
+  
+  // Metadata
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+  completedAt            DateTime?
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_profiles")
+  @@index([userId])
+  @@index([isOnboardingCompleted])
+}

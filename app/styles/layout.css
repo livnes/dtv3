@@ -1,0 +1,114 @@
+@reference "tailwindcss";
+
+/* ========================================================================
+   File:   app/styles/layout.css
+   Purpose: Layout components (sidebar, main-content, headers), using @apply
+   ========================================================================
+
+@layer components {
+  /* App Wrapper */
+.app-container {
+    @apply flex min-h-screen;
+}
+
+/* Main Content Area (pushes aside sidebar) */
+.main-content {
+    @apply flex-1 min-h-screen bg-white mr-[260px] transition-all duration-300;
+}
+
+/* Header Section */
+.main-header {
+    @apply p-12 border-b border-gray-200 bg-gradient-to-br from-white to-gray-50;
+}
+
+.welcome-title {
+    @apply text-4xl font-bold text-gray-800 mb-2 leading-tight;
+}
+
+.welcome-subtitle {
+    @apply text-lg text-gray-600 m-0;
+}
+
+/* Sidebar */
+.sidebar {
+    @apply fixed top-0 right-0 w-[260px] h-screen bg-white border-l border-gray-200 z-50 flex flex-col transition-transform duration-300;
+}
+
+.sidebar-header {
+    @apply p-6 border-b border-gray-200;
+}
+
+.sidebar-logo {
+    @apply flex items-center gap-3 text-xl font-bold text-blue-500 no-underline;
+}
+
+.sidebar-nav {
+    @apply flex-1 py-4;
+}
+
+.sidebar-nav ul {
+    @apply list-none m-0 p-0;
+}
+
+.sidebar-nav li {
+    @apply mb-1;
+}
+
+.sidebar-nav a {
+    @apply flex items-center gap-3 px-6 py-3 text-gray-600 no-underline font-medium transition-all duration-200 border-r-[3px] border-transparent;
+}
+
+.sidebar-nav a:hover {
+    @apply bg-gray-50 text-gray-800;
+}
+
+.sidebar-nav a.active {
+    @apply bg-gray-50 text-blue-500 border-r-blue-500;
+}
+
+.sidebar-nav i {
+    @apply w-5 text-center;
+}
+
+.sidebar-user {
+    @apply p-6 border-t border-gray-200;
+}
+
+.user-info {
+    @apply flex items-center gap-3 mb-2;
+}
+
+.user-avatar {
+    @apply w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center font-bold text-white text-base;
+}
+
+.user-details h6 {
+    @apply m-0 text-sm font-semibold text-gray-800;
+}
+
+.user-details p {
+    @apply m-0 text-xs text-gray-500;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+    .main-content {
+        @apply mr-0;
+    }
+
+    .sidebar {
+        @apply -translate-x-full;
+    }
+
+    .sidebar.mobile-open {
+        @apply translate-x-0;
+    }
+
+    .main-header {
+        @apply p-6;
+    }
+
+    .welcome-title {
+        @apply text-3xl;
+    }
+}

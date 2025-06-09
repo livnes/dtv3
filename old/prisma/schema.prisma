@@ -1,0 +1,289 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  accounts                Account[]
+  sessions                Session[]
+  integrations            UserIntegration[]
+  metrics                 Metrics[]
+  demographics            UserDemographic[]
+  trafficSources          TrafficSource[]
+  audienceInsights        AudienceInsight[]
+  searchConsoleProperties SearchConsoleProperty[]
+  searchConsoleMetrics    SearchConsoleMetrics[]
+
+  @@map("users")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+model UserIntegration {
+  id            String   @id @default(cuid())
+  userId        String
+  provider      String   // 'google', 'facebook', 'tiktok'
+  providerId    String?  // Provider's user ID
+  accessToken   String?  @db.Text // Encrypted
+  refreshToken  String?  @db.Text // Encrypted
+  tokenExpiry   DateTime?
+  scope         String?  // OAuth scopes granted
+  status        String   @default("connected") // 'connected', 'expired', 'revoked'
+  metadata      Json?    // Additional provider-specific data
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, provider])
+  @@map("user_integrations")
+}
+
+model Metrics {
+  id                String   @id @default(cuid())
+  userId            String
+  propertyId        String
+  source            String   // 'google_analytics', 'search_console', etc.
+  
+  // Traffic metrics
+  sessions          Int      @default(0)
+  users             Int      @default(0)
+  pageviews         Int      @default(0)
+  bounceRate        Float    @default(0)
+  avgSessionDuration Float   @default(0)
+  
+  // Conversion metrics  
+  conversions       Int      @default(0)
+  conversionRate    Float    @default(0)
+  revenue           Float    @default(0)
+  
+  // Quality score
+  qualityScore      Float    @default(0)
+  
+  date              DateTime
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, propertyId, source, date])
+  @@map("metrics")
+}
+
+model UserDemographic {
+  id              String   @id @default(cuid())
+  userId          String
+  source          String   // 'google_analytics', 'facebook', 'tiktok', 'google_ads'
+  propertyId      String?  // GA4 property, FB page, etc.
+  
+  // Demographic data
+  ageGroup        String?  // '18-24', '25-34', '35-44', '45-54', '55-64', '65+'
+  gender          String?  // 'male', 'female', 'unknown'
+  location        String?  // Country/Region
+  city            String?
+  
+  // Device data
+  deviceCategory  String?  // 'mobile', 'desktop', 'tablet'
+  operatingSystem String?  // 'iOS', 'Android', 'Windows', 'macOS'
+  browser         String?  // 'Chrome', 'Safari', 'Firefox'
+  
+  // Metrics
+  sessions        Int      @default(0)
+  users           Int      @default(0)
+  newUsers        Int      @default(0)
+  bounceRate      Float    @default(0)
+  avgSessionDuration Float @default(0)
+  conversions     Int      @default(0)
+  revenue         Float    @default(0)
+  
+  // Date for time series analysis
+  date            DateTime
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, source, propertyId, ageGroup, gender, deviceCategory, date])
+  @@map("user_demographics")
+}
+
+model TrafficSource {
+  id              String   @id @default(cuid())
+  userId          String
+  source          String   // 'google_analytics', 'facebook_ads', 'tiktok_ads'
+  propertyId      String?
+  
+  // Traffic source details
+  medium          String   // 'organic', 'cpc', 'social', 'email', 'referral'
+  sourceName      String   // 'google', 'facebook', 'tiktok', 'instagram'
+  campaign        String?  // Campaign name if available
+  
+  // Demographic breakdown
+  ageGroup        String?
+  gender          String?
+  deviceCategory  String?
+  
+  // Metrics
+  sessions        Int      @default(0)
+  users           Int      @default(0)
+  bounceRate      Float    @default(0)
+  avgSessionDuration Float @default(0)
+  conversions     Int      @default(0)
+  conversionRate  Float    @default(0)
+  cost            Float    @default(0) // For paid traffic
+  
+  date            DateTime
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, source, sourceName, medium, ageGroup, gender, deviceCategory, date])
+  @@map("traffic_sources")
+}
+
+model AudienceInsight {
+  id              String   @id @default(cuid())
+  userId          String
+  source          String   // Platform that provided the insight
+  propertyId      String?
+  
+  // Insight metadata
+  insightType     String   // 'top_demographic', 'device_preference', 'geographic_trend'
+  category        String   // 'age', 'gender', 'device', 'location', 'behavior'
+  
+  // Insight data
+  dimension       String   // e.g., '25-34', 'mobile', 'ios'
+  value           Float    // Percentage or count
+  metric          String   // 'percentage', 'count', 'conversion_rate'
+  
+  // Context
+  description     String?  // Human readable description
+  recommendation  String?  // AI generated recommendation
+  
+  date            DateTime
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("audience_insights")
+}
+
+model SearchConsoleProperty {
+  id              String   @id @default(cuid())
+  userId          String
+  propertyUrl     String
+  siteUrl         String
+  verified        Boolean  @default(false)
+  permissionLevel String?  // FULL, RESTRICTED, SITE_OWNER, etc.
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  keywords        SearchKeyword[]
+  
+  @@unique([userId, propertyUrl])
+  @@map("search_console_properties")
+}
+
+model SearchKeyword {
+  id                    String   @id @default(cuid())
+  propertyId           String
+  keyword              String
+  country              String   @default("il")
+  device               String   @default("DESKTOP") // DESKTOP, MOBILE, TABLET
+  searchType           String   @default("WEB") // WEB, IMAGE, VIDEO
+  
+  // Metrics
+  clicks               Int      @default(0)
+  impressions          Int      @default(0)
+  ctr                  Float    @default(0)
+  position             Float    @default(0)
+  
+  // Date for historical tracking
+  date                 DateTime
+  
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  property             SearchConsoleProperty @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  
+  @@unique([propertyId, keyword, date, country, device])
+  @@map("search_keywords")
+}
+
+model SearchConsoleMetrics {
+  id                   String   @id @default(cuid())
+  userId               String
+  propertyId          String
+  
+  // Daily aggregated metrics
+  totalClicks         Int      @default(0)
+  totalImpressions    Int      @default(0)
+  averageCtr          Float    @default(0)
+  averagePosition     Float    @default(0)
+  
+  // Top keywords count
+  topKeywordsCount    Int      @default(0)
+  improvingKeywords   Int      @default(0)
+  decliningKeywords   Int      @default(0)
+  
+  date                DateTime
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, propertyId, date])
+  @@map("search_console_metrics")
+} 

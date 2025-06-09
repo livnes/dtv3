@@ -1,0 +1,68 @@
+@reference "tailwindcss";
+
+@layer components {
+
+    /* Flash Messages */
+    .flash-messages {
+        @apply fixed top-4 left-1/2 -translate-x-1/2 z-50 w-full max-w-md px-4;
+    }
+
+    .flash-message {
+        @apply flex items-center gap-3 p-4 mb-3 rounded-lg shadow-lg border-l-4 text-sm font-medium transition-all duration-300;
+    }
+
+    .flash-message.success {
+        @apply bg-green-50 border-green-500 text-green-800;
+    }
+
+    .flash-message.error {
+        @apply bg-red-50 border-red-500 text-red-800;
+    }
+
+    .flash-message.warning {
+        @apply bg-yellow-50 border-yellow-500 text-yellow-800;
+    }
+
+    .flash-message.info {
+        @apply bg-blue-50 border-blue-500 text-blue-800;
+    }
+
+    .flash-close {
+        @apply ml-auto bg-transparent border-none text-current cursor-pointer p-1 rounded hover:bg-black/10;
+    }
+
+    /* Loading States */
+    .loading-container {
+        @apply flex flex-col items-center justify-center min-h-[200px] text-center;
+    }
+
+    .loading-spinner {
+        @apply w-8 h-8 border-2 border-gray-200 border-t-blue-500 rounded-full animate-spin mb-4;
+    }
+
+    .loading-text {
+        @apply text-gray-600 text-sm;
+    }
+
+    /* Account Stats */
+    .account-stats {
+        @apply grid grid-cols-2 gap-4 mt-4 p-4 bg-gray-50 rounded-lg;
+    }
+
+    .account-stats-number {
+        @apply text-lg font-bold text-blue-500;
+    }
+
+    .account-stats-label {
+        @apply text-xs text-gray-400;
+    }
+
+    /* Stat Numbers */
+    .stat-number {
+        @apply text-2xl font-bold text-blue-500 mb-1;
+    }
+
+    .stat-label {
+        @apply text-xs text-gray-600;
+    }
+}

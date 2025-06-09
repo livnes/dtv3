@@ -1,0 +1,29 @@
+/* ========================================================================
+   File:   app/styles/globals.css
+   Purpose: Main entry point—loads Tailwind’s layers and then your custom CSS
+   ========================================================================
+
+/* 1. Tailwind’s base reset & preflight */
+@tailwind base;
+
+/* 2. Your custom base layer (CSS variables, global resets) */
+@import './base.css';
+
+/* 3. Tailwind’s component layer (built-in component styles) */
+@tailwind components;
+
+/* 4. Your custom component files—each wrapped in @layer components */
+@import './layout.css';
+@import './ui/buttons.css';
+@import './ui/cta.css';
+@import './components/cards.css';
+@import './components/forms.css';
+@import './components/profile.css';
+@import './components/utilities.css';
+@import './components/actions.css';
+
+/* 5. Tailwind’s utility layer (built-in utility classes) */
+@tailwind utilities;
+
+/* 6. Any custom utility overrides (wrapped in @layer utilities) */
+/* optional—only if you actually created utilities.css */

@@ -1,0 +1,52 @@
+/* ========================================================================
+   File:   app/styles/ui/cta.css
+   Purpose: Call-to-Action (e.g. hero section) styles using @apply
+   ======================================================================== */
+
+@reference "tailwindcss";
+
+@layer components {
+    .cta-wrapper {
+        @apply flex flex-col items-center justify-center text-center py-16 px-4 bg-gray-50;
+    }
+
+    .cta-headline {
+        @apply text-4xl font-bold mb-4 text-gray-800;
+    }
+
+    .cta-subheading {
+        @apply text-lg mb-8 text-gray-600 max-w-2xl;
+    }
+
+    .cta-button {
+        @apply inline-flex items-center gap-2 px-6 py-3 rounded-lg font-medium text-gray-600 bg-gray-50 border border-gray-200 transition-all hover:bg-gray-100 hover:text-gray-800 text-lg;
+    }
+
+    .search-section {
+        @apply py-8 bg-gray-50 border-b border-gray-200;
+    }
+
+    .search-container {
+        @apply max-w-3xl mx-auto relative px-8;
+    }
+
+    .search-input {
+        @apply w-full py-4 px-6 pr-16 border-2 border-gray-200 rounded-xl text-base outline-none transition-colors duration-200 focus:border-blue-500;
+    }
+
+    .search-submit {
+        @apply absolute right-10 top-1/2 -translate-y-1/2 bg-blue-500 text-white border-none rounded-lg p-3 cursor-pointer transition-colors duration-200 hover:bg-blue-600;
+    }
+
+    .quick-actions {
+        @apply flex flex-wrap gap-3 mt-6 justify-center;
+    }
+
+    .action-pill {
+        @apply flex items-center gap-2 py-3 px-4 bg-white border border-gray-200 rounded-full text-gray-800 no-underline text-sm font-medium transition-all duration-200 cursor-pointer hover:bg-blue-500 hover:text-white hover:border-blue-500 hover:-translate-y-0.5 hover:shadow-md;
+    }
+
+    .action-pill.active {
+        @apply bg-blue-500 text-white border-blue-500 -translate-y-0.5 shadow-md;
+    }
+}
